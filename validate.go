@@ -64,6 +64,23 @@ func (c Config) Validate() error {
 	validateResizeRootFS(&errs, c.ResizeRootFS)
 	validateSystemModules(&errs, c)
 	validateIntegrationModules(&errs, c)
+	validateConfigExtra(&errs, c.Extra)
 
 	return errs.Err()
+}
+
+func validateConfigExtra(errs *ValidationErrors, extra RawObject) {
+	if extra == nil {
+		return
+	}
+	modules := SupportedModuleSet()
+	for name := range extra {
+		if name == "" {
+			errs.add("extra", "extension names must be non-empty")
+			continue
+		}
+		if _, supported := modules[name]; supported {
+			errs.add("extra."+name, "conflicts with a supported module")
+		}
+	}
 }

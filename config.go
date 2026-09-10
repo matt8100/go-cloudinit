@@ -129,7 +129,7 @@ type Config struct {
 	SSHDeleteKeys          *bool               `yaml:"ssh_deletekeys,omitempty"`
 	SSHGenKeyTypes         []SSHKeyType        `yaml:"ssh_genkeytypes,omitempty"`
 	DisableRoot            *bool               `yaml:"disable_root,omitempty"`
-	DisableRootOpts        string              `yaml:"disable_root_opts,omitempty"`
+	DisableRootOpts        *string             `yaml:"disable_root_opts,omitempty"`
 	AllowPublicSSHKeys     *bool               `yaml:"allow_public_ssh_keys,omitempty"`
 	SSHQuietKeygen         *bool               `yaml:"ssh_quiet_keygen,omitempty"`
 	SSHPublishHostKeys     *SSHPublishHostKeys `yaml:"ssh_publish_hostkeys,omitempty"`
@@ -178,4 +178,8 @@ type Config struct {
 	Spacewalk      *SpacewalkConfig      `yaml:"spacewalk,omitempty"`
 	UbuntuPro      *UbuntuProConfig      `yaml:"ubuntu_pro,omitempty"`
 	WireGuard      *WireGuardConfig      `yaml:"wireguard,omitempty"`
+
+	// Extra holds vendor-specific top-level cloud-config keys. Keys must not
+	// duplicate modules supported directly by Config.
+	Extra RawObject `yaml:",inline,omitempty"`
 }

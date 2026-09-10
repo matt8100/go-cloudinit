@@ -31,7 +31,7 @@ package main
 import (
 	"fmt"
 
-	"go-cloudinit"
+	"github.com/matt8100/go-cloudinit"
 )
 
 func main() {

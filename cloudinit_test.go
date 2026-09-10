@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 func TestConfigRender(t *testing.T) {
@@ -133,6 +133,51 @@ func TestConfigRender(t *testing.T) {
 		if !strings.Contains(string(rendered), needle) {
 			t.Fatalf("rendered config missing %q\n%s", needle, rendered)
 		}
+	}
+}
+
+func TestConfigRenderExtensionsAndExplicitEmptyDisableRootOpts(t *testing.T) {
+	cfg := Config{
+		DisableRootOpts: StringPtr(""),
+		Extra: RawObject{
+			"bluecat_license": RawObject{
+				"id":  "0014000000L0yAK",
+				"key": "license-key",
+			},
+			"bluecat_netconf": RawObject{
+				"ipaddr":  "192.0.2.20",
+				"cidr":    "24",
+				"gateway": "192.0.2.2",
+			},
+			"bluecat_service_config": RawObject{
+				"payload": `{"version":"1.3.0"}`,
+			},
+		},
+	}
+
+	rendered, err := cfg.Render()
+	if err != nil {
+		t.Fatalf("Render() error = %v", err)
+	}
+	for _, needle := range []string{
+		"disable_root_opts: \"\"",
+		"bluecat_license:",
+		"bluecat_netconf:",
+		"bluecat_service_config:",
+	} {
+		if !strings.Contains(string(rendered), needle) {
+			t.Fatalf("rendered config missing %q\n%s", needle, rendered)
+		}
+	}
+}
+
+func TestConfigExtraRejectsSupportedModuleNames(t *testing.T) {
+	err := (Config{Extra: RawObject{"hostname": "vendor-host"}}).Validate()
+	if err == nil {
+		t.Fatal("Validate() returned nil error for extension colliding with a supported module")
+	}
+	if !strings.Contains(err.Error(), "extra.hostname") {
+		t.Fatalf("expected collision error path, got %v", err)
 	}
 }
 

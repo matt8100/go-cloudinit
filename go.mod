@@ -1,4 +1,4 @@
-module go-cloudinit
+module github.com/matt8100/go-cloudinit
 
 go 1.24.4
 
